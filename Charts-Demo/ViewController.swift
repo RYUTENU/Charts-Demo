@@ -15,7 +15,12 @@ class ViewController: UIViewController {
         
         let chartView = LineChartView()
         chartView.backgroundColor = .systemBlue
+        // 右側のY軸を無効
         chartView.rightAxis.enabled = false
+        // ダブルタップズームを無効
+        chartView.doubleTapToZoomEnabled = false
+        // 選択ラインをスライド移動
+        chartView.dragEnabled = true
         
         let yAxis = chartView.leftAxis
         yAxis.labelFont = .systemFont(ofSize: 8)
@@ -43,11 +48,25 @@ class ViewController: UIViewController {
         lineChartView.centerInSuperview()
         lineChartView.width(to: view)
         lineChartView.heightToWidth(of: view)
+        lineChartView.delegate = self
         
         setData()
     }
     
-    func setData() {
+    private func showMarkerView(value: String) {
+        let marker = MarkerView(frame: CGRect(x: 0, y: 0, width: 60, height: 20))
+        marker.chartView = lineChartView
+        let label = UILabel(frame: CGRect(x: 0, y: 0, width: 60, height: 20))
+        label.text = "\(value)"
+        label.textColor = .systemTeal
+        label.font = .systemFont(ofSize: 12)
+        label.backgroundColor = .gray
+        label.textAlignment = .center
+        marker.addSubview(label)
+        self.lineChartView.marker = marker
+    }
+    
+    private func setData() {
         let set = LineChartDataSet(entries: yValues, label: "Subscribers")
         
         set.mode = .cubicBezier
@@ -85,6 +104,6 @@ class ViewController: UIViewController {
 extension ViewController: ChartViewDelegate {
     
     func chartValueSelected(_ chartView: ChartViewBase, entry: ChartDataEntry, highlight: Highlight) {
-        
+        self.showMarkerView(value: "\(Int(entry.y))")
     }
 }
